@@ -12,7 +12,6 @@ BOT_TOKEN = environ['BOT_TOKEN']
 USERBOT_STRING_SESSION = environ.get('USERBOT_STRING_SESSION')
 
 # Bot settings
-MAX_RESULTS = int(environ.get('MAX_RESULTS', 10))
 CACHE_TIME = int(environ.get('CACHE_TIME', 300))
 USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', False))
 
@@ -30,11 +29,12 @@ DATABASE_NAME = environ['DATABASE_NAME']
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
 
 # Messages
-START_MSG = """
+default_start_msg = """
 **Hi, I'm Media Search bot**
 
 Here you can search files in inline mode. Just press following buttons and start searching.
 """
 
+START_MSG = environ.get('START_MSG', default_start_msg)
 SHARE_BUTTON_TEXT = 'Checkout {username} for searching files'
 INVITE_MSG = environ.get('INVITE_MSG', 'Please join @.... to use this bot')

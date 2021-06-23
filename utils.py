@@ -22,12 +22,12 @@ instance = Instance.from_db(db)
 @instance.register
 class Media(Document):
     file_id = fields.StrField(attribute='_id')
-    file_ref = fields.StrField()
+    file_ref = fields.StrField(allow_none=True)
     file_name = fields.StrField(required=True)
     file_size = fields.IntField(required=True)
-    file_type = fields.StrField()
-    mime_type = fields.StrField()
-    caption = fields.StrField()
+    file_type = fields.StrField(allow_none=True)
+    mime_type = fields.StrField(allow_none=True)
+    caption = fields.StrField(allow_none=True)
 
     class Meta:
         collection_name = COLLECTION_NAME
@@ -47,14 +47,11 @@ async def save_file(media):
             file_size=media.file_size,
             file_type=media.file_type,
             mime_type=media.mime_type,
+            caption=media.caption.html if media.caption else None,
         )
     except ValidationError:
         logger.exception('Error occurred while saving file in database')
     else:
-        caption = media.caption
-        if caption:
-            file.caption = caption
-
         try:
             await file.commit()
         except DuplicateKeyError:
@@ -70,9 +67,9 @@ async def get_search_results(query, file_type=None, max_results=10, offset=0):
     if not query:
         raw_pattern = '.'
     elif ' ' not in query:
-        raw_pattern =r'(\b|[\.\+\-_])' + query + r'(\b|[\.\+\-_])'
+        raw_pattern = r'(\b|[\.\+\-_])' + query + r'(\b|[\.\+\-_])'
     else:
-        raw_pattern = query.replace(' ', r'[\s\.\+\-_]')
+        raw_pattern = query.replace(' ', r'.*[\s\.\+\-_]')
 
     try:
         regex = re.compile(raw_pattern, flags=re.IGNORECASE)
